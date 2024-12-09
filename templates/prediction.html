@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Prediction{% endblock title %}
+
+{% block body %}
+
+<section class="text-gray-600 body-font">
+  <div class="container mx-auto flex flex-col px-5 py-24 justify-center items-center">
+    <img class="lg:w-2/6 md:w-3/6 w-5/6 mb-10 object-cover object-center rounded" 
+         alt="hero" 
+         src="https://media.springernature.com/lw685/springer-static/image/art%3A10.1140%2Fepjs%2Fs11734-024-01172-9/MediaObjects/11734_2024_1172_Fig1_HTML.png">
+    
+    <div class="w-full md:w-2/3 flex flex-col mb-16 items-center text-center">
+      <h1 class="title-font sm:text-4xl text-3xl mb-4 font-medium text-gray-900">
+        Disaster Or Non-Disaster Tweet Prediction
+      </h1>
+      
+      <p class="mb-8 leading-relaxed">
+        Here, we are predicting whether a tweet is about a real disaster or not.
+      </p>
+
+      <div class="flex w-full justify-center items-end">
+        <div class="relative mr-4 lg:w-full xl:w-1/2 w-2/4 md:w-full text-left">
+          <label for="hero-field" class="leading-7 text-sm text-gray-600">Write your Tweet Here</label>
+          <input 
+            type="textarea" 
+            id="hero-field" 
+            name="hero-field" 
+            class="w-full bg-gray-100 bg-opacity-50 rounded focus:ring-2 focus:ring-indigo-200 focus:bg-transparent border border-gray-300 focus:border-indigo-500 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out">
+        </div>
+        <button 
+          id="predict-button" 
+          class="inline-flex text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded text-lg">
+          Prediction
+        </button>
+      </div>
+
+      <div></div>
+    </div>
+  </div> 
+</section>
+
+<script>
+  // List of disaster-related words
+  const disasterWords = ['no_keyword', 'derailment', 'outbreak', 'wreckage', 'debris', 'oil%20spill', 'typhoon', 'evacuated', 'rescuers', 'suicide%20bomb', 'suicide%20bombing', 'nuclear%20disaster', 'razed', 'airplane%20accident', 'earthquake', 'suicide%20bomber', 'bridge%20collapse', 'collision', 'wildfire', 'buildings%20on%20fire', 'casualties', 'drought', 'evacuation', 'mass%20murder', 'sandstorm', 'bombing', 'devastation', 'forest%20fires', 'hostages', 'sinkhole', 'wild%20fires', 'deaths', 'derailed', 'displaced', 'famine', 'fatal', 'fatalities', 'floods', 'thunderstorm', 'violent%20storm', 'wounded', 'attack', 'evacuate', 'flooding', 'heat%20wave', 'massacre', 'accident', 'buildings%20burning', 'dust%20storm', 'hailstorm', 'injured', 'terrorism', 'collided', 'rioting', 'structural%20failure', 'terrorist', 'arson', 'bioterror', 'fire%20truck', 'hazardous', 'refugees', 'tragedy', 'attacked', 'bioterrorism', 'burning%20buildings', 'crashed', 'emergency%20plan', 'police', 'survivors', 'ambulance', 'catastrophic', 'explosion', 'hurricane', 'bombed', 'cyclone', 'damage', 'engulfed', 'hijacker', 'mass%20murderer', 'bush%20fires', 'devastated', 'hail', 'natural%20disaster', 'rainstorm', 'storm', 'volcano', 'derail', 'lightning', 'rescued', 'weapons', 'hijack', 'tornado', 'windstorm', 'bomb', 'casualty', 'chemical%20emergency', 'collapse', 'disaster', 'drowned', 'flood', 'forest%20fire', 'hijacking', 'hostage', 'emergency', 'landslide', 'nuclear%20reactor', 'quarantined', 'weapon', 'whirlwind', 'ablaze', 'collapsed', 'electrocuted', 'flames', 'seismic', 'snowstorm', 'crash', 'eyewitness', 'first%20responders', 'mudslide', 'thunder', 'annihilated', 'emergency%20services', 'fire', 'injury', 'trauma', 'tsunami', 'annihilation', 'burning', 'detonate', 'fatality', 'rubble', 'survived', 'wounds', 'apocalypse', 'death', 'demolition', 'destroy', 'detonation', 'drowning', 'exploded', 'injuries', 'sunk', 'trapped', 'arsonist', 'cliff%20fall', 'danger', 'destroyed', 'military', 'pandemonium', 'sinking', 'burned', 'catastrophe', 'dead', 'deluged', 'demolished', 'desolate', 'desolation', 'hazard', 'hellfire', 'loud%20bang', 'sirens', 'war%20zone', 'wreck', 'deluge', 'destruction', 'inundated', 'riot', 'upheaval', 'armageddon', 'army', 'battle', 'blaze', 'bleeding', 'blood', 'blown%20up', 'body%20bagging', 'curfew', 'demolish', 'fear', 'flattened', 'lava', 'meltdown', 'quarantine', 'radiation%20emergency', 'rescue', 'screams', 'siren', 'survive', 'trouble', 'twister', 'avalanche', 'blizzard', 'crush', 'crushed', 'harm', 'obliterate', 'obliterated', 'obliteration', 'screamed', 'bloody', 'collide', 'drown', 'explode', 'mayhem', 'panic', 'smoke', 'stretcher', 'wrecked', 'blew%20up', 'blight', 'inundation', 'panicking', 'screaming', 'threat', 'traumatised', 'blazing', 'body%20bag', 'body%20bags', 'electrocute', 'epicentre', 'ruin'];
+
+  // Get the button and input field
+  const predictButton = document.getElementById('predict-button');
+  const inputField = document.getElementById('hero-field');
+
+  // Event listener for the button
+  predictButton.addEventListener('click', function() {
+    const userInput = inputField.value.trim().toLowerCase(); // Get and clean the input
+    let isDisaster = false;
+
+    // Check if any disaster word exists in the input
+    disasterWords.forEach(word => {
+      if (userInput.includes(word)) {
+        isDisaster = true;
+      }
+    });
+
+    if (isDisaster) {
+      alert('Prediction: Disaster');
+    } else {
+      alert('Prediction: Non-Disaster');
+      // Simulate form submission (optional)
+      // You can submit the form here if needed using FormData or a fetch() request
+      // Example: submitDataToDatabase(userInput);
+    }
+  });
+</script>
+
+{% endblock body %}
